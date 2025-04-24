@@ -12,124 +12,126 @@
 <body>
     <h1>Class Organizer</h1>
 
-    <section id="schedule">
-        <h2>Weekly Schedule</h2>
+    <main>
+        <article class="card" id="schedule">
+            <h2>Weekly Schedule</h2>
 
-        <form id="add-schedule-item-form">
-            <div id="days-container">
-                <div class="day-checkbox">
-                    <input type="checkbox" id="sunday" name="days" value="Sunday">
-                    <label for="sunday">Sunday</label>
+            <form id="add-schedule-item-form">
+                <div id="days-container">
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="sunday" name="days" value="Sunday">
+                        <label for="sunday">Sunday</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="monday" name="days" value="Monday">
+                        <label for="monday">Monday</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="tuesday" name="days" value="Tuesday">
+                        <label for="tuesday">Tuesday</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="wednesday" name="days" value="Wednesday">
+                        <label for="wednesday">Wednesday</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="thursday" name="days" value="Thursday">
+                        <label for="thursday">Thursday</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="friday" name="days" value="Friday">
+                        <label for="friday">Friday</label>
+                    </div>
+                    <div class="day-checkbox">
+                        <input type="checkbox" id="saturday" name="days" value="Saturday">
+                        <label for="saturday">Saturday</label>
+                    </div>
                 </div>
-                <div class="day-checkbox">
-                    <input type="checkbox" id="monday" name="days" value="Monday">
-                    <label for="monday">Monday</label>
+                
+                <div class="grid">
+                    <div>
+                        <label for="startTime">Start Time:</label>
+                        <input type="time" id="startTime" name="startTime" required>
+                    </div>
+                    <div>
+                        <label for="endTime">End Time:</label>
+                        <input type="time" id="endTime" name="endTime">
+                    </div>
                 </div>
-                <div class="day-checkbox">
-                    <input type="checkbox" id="tuesday" name="days" value="Tuesday">
-                    <label for="tuesday">Tuesday</label>
-                </div>
-                <div class="day-checkbox">
-                    <input type="checkbox" id="wednesday" name="days" value="Wednesday">
-                    <label for="wednesday">Wednesday</label>
-                </div>
-                <div class="day-checkbox">
-                    <input type="checkbox" id="thursday" name="days" value="Thursday">
-                    <label for="thursday">Thursday</label>
-                </div>
-                <div class="day-checkbox">
-                    <input type="checkbox" id="friday" name="days" value="Friday">
-                    <label for="friday">Friday</label>
-                </div>
-                <div class="day-checkbox">
-                    <input type="checkbox" id="saturday" name="days" value="Saturday">
-                    <label for="saturday">Saturday</label>
-                </div>
-            </div>
-            
-            <div class="grid">
+                
                 <div>
-                    <label for="startTime">Start Time:</label>
-                    <input type="time" id="startTime" name="startTime" required>
+                    <label for="subject">Class/Subject:</label>
+                    <input type="text" id="subject" name="subject" placeholder="e.g., Math 101" required>
                 </div>
+                
+                <button type="submit">Add Schedule Item</button>
+            </form>
+
+            <div id="schedule-grid">
+                <!-- Schedule items will be dynamically added here -->
+            </div>
+        </article>
+
+        <article class="card" id="due-dates">
+            <h2>Due Dates</h2>
+
+            <form id="add-due-date-form">
+                <div class="grid">
+                    <div>
+                        <label for="class">Class Name:</label>
+                        <input type="text" id="class" name="class" placeholder="e.g., Math 101" required>
+                    </div>
+                    <div>
+                        <label for="title">Assignment Title:</label>
+                        <input type="text" id="title" name="title" placeholder="e.g., Homework 5" required>
+                    </div>
+                </div>
+                
                 <div>
-                    <label for="endTime">End Time:</label>
-                    <input type="time" id="endTime" name="endTime">
+                    <label for="dueDate">Due Date & Time:</label>
+                    <input type="datetime-local" id="dueDate" name="dueDate" required>
                 </div>
-            </div>
-            
-            <div>
-                <label for="subject">Class/Subject:</label>
-                <input type="text" id="subject" name="subject" placeholder="e.g., Math 101" required>
-            </div>
-            
-            <button type="submit">Add Schedule Item</button>
-        </form>
-
-        <div id="schedule-grid">
-            <!-- Schedule items will be dynamically added here -->
-        </div>
-    </section>
-
-    <section id="due-dates">
-        <h2>Due Dates</h2>
-
-        <form id="add-due-date-form">
-            <div class="grid">
+                
                 <div>
-                    <label for="class">Class Name:</label>
-                    <input type="text" id="class" name="class" placeholder="e.g., Math 101" required>
+                    <label for="notes">Notes:</label>
+                    <input type="text" id="notes" name="notes" placeholder="Optional notes">
                 </div>
+                
+                <button type="submit">Add Due Date</button>
+            </form>
+
+            <ul id="due-dates-list">
+                <!-- Due date items will be dynamically added here -->
+            </ul>
+        </article>
+
+        <article class="card" id="activities">
+            <h2>Activities</h2>
+
+            <form id="add-activity-form">
                 <div>
-                    <label for="title">Assignment Title:</label>
-                    <input type="text" id="title" name="title" placeholder="e.g., Homework 5" required>
+                    <label for="name">Activity Name:</label>
+                    <input type="text" id="name" name="name" placeholder="e.g., Study Group" required>
                 </div>
-            </div>
-            
-            <div>
-                <label for="dueDate">Due Date & Time:</label>
-                <input type="datetime-local" id="dueDate" name="dueDate" required>
-            </div>
-            
-            <div>
-                <label for="notes">Notes:</label>
-                <input type="text" id="notes" name="notes" placeholder="Optional notes">
-            </div>
-            
-            <button type="submit">Add Due Date</button>
-        </form>
+                
+                <div>
+                    <label for="date">Date & Time:</label>
+                    <input type="datetime-local" id="date" name="date" required>
+                </div>
+                
+                <div>
+                    <label for="activityNotes">Notes:</label>
+                    <input type="text" id="activityNotes" name="notes" placeholder="Optional notes">
+                </div>
+                
+                <button type="submit">Add Activity</button>
+            </form>
 
-        <ul id="due-dates-list">
-            <!-- Due date items will be dynamically added here -->
-        </ul>
-    </section>
-
-    <section id="activities">
-        <h2>Activities</h2>
-
-        <form id="add-activity-form">
-            <div>
-                <label for="name">Activity Name:</label>
-                <input type="text" id="name" name="name" placeholder="e.g., Study Group" required>
-            </div>
-            
-            <div>
-                <label for="date">Date & Time:</label>
-                <input type="datetime-local" id="date" name="date" required>
-            </div>
-            
-            <div>
-                <label for="activityNotes">Notes:</label>
-                <input type="text" id="activityNotes" name="notes" placeholder="Optional notes">
-            </div>
-            
-            <button type="submit">Add Activity</button>
-        </form>
-
-        <ul id="activities-list">
-            <!-- Activity items will be dynamically added here -->
-        </ul>
-    </section>
+            <ul id="activities-list">
+                <!-- Activity items will be dynamically added here -->
+            </ul>
+        </article>
+    </main>
 
     <script src="script.js"></script>
 </body>
