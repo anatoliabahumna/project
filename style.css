@@ -104,4 +104,36 @@ form button:hover {
 form label {
     margin-right: 5px;
     font-weight: bold;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    body {
+        margin: 10px; /* Reduce margin on smaller screens */
+    }
+
+    form {
+        flex-direction: column; /* Stack form elements vertically */
+        align-items: stretch; /* Make elements take full width */
+    }
+
+    form input[type="text"],
+    form input[type="time"],
+    form input[type="date"],
+    form input[type="datetime-local"],
+    form select,
+    form button {
+        width: 100%; /* Ensure form elements use available width */
+        box-sizing: border-box; /* Include padding/border in width */
+    }
+
+    #schedule-grid {
+        grid-template-columns: 1fr; /* Single column for schedule */
+        gap: 5px; /* Reduce gap */
+    }
+
+    .schedule-day {
+        min-height: 50px; /* Adjust min height */
+        margin-bottom: 10px; /* Add space between days in single column */
+    }
 } 

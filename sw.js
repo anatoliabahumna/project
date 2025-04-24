@@ -1,12 +1,13 @@
 const CACHE_NAME = 'class-organizer-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  // Add paths to icons if you create them, e.g.:
-  // '/icons/icon-192x192.png',
-  // '/icons/icon-512x512.png'
+  './', // Relative path for the root/directory
+  './index.html',
+  './style.css',
+  './script.js',
+  './manifest.json' // Add manifest to cache
+  // Add relative paths to icons if you create them, e.g.:
+  // './icons/icon-192x192.png',
+  // './icons/icon-512x512.png'
 ];
 
 // Install event: Cache the core assets
