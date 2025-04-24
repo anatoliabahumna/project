@@ -17,29 +17,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const DUEDATES_KEY = 'classOrganizer_dueDates';
     const ACTIVITIES_KEY = 'classOrganizer_activities';
 
-    // --- Load Data from Local Storage ---
+    // --- Load Data from Local Storage (with Error Handling) ---
     function loadData(key) {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : [];
+        try {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : [];
+        } catch (e) {
+            console.error(`Error loading data for key "${key}" from localStorage:`, e);
+            alert(`Could not load data. LocalStorage might be disabled or full.`);
+            return [];
+        }
     }
 
     let scheduleItems = loadData(SCHEDULE_KEY);
     let dueDates = loadData(DUEDATES_KEY);
     let activities = loadData(ACTIVITIES_KEY);
 
-    // --- Save Data to Local Storage ---
+    // --- Save Data to Local Storage (with Error Handling) ---
     function saveData(key, data) {
-        localStorage.setItem(key, JSON.stringify(data));
+        try {
+            localStorage.setItem(key, JSON.stringify(data));
+        } catch (e) {
+            console.error(`Error saving data for key "${key}" to localStorage:`, e);
+            alert(`Could not save data. LocalStorage might be disabled or full.`);
+        }
     }
 
     // --- Utility Functions ---
-    
-    // Generate a unique ID for items
     function generateId() {
         return Date.now().toString();
     }
-    
-    // Format time from 24h to 12h format with AM/PM
+
     function formatTime(timeString) {
         if (!timeString) return '';
         const [hours, minutes] = timeString.split(':');
@@ -48,14 +56,65 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedHour = hour % 12 || 12;
         return `${formattedHour}:${minutes} ${ampm}`;
     }
+    
+    function formatDateTime(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+    }
 
-    // --- Functions to Display Data ---
+    // --- Generic Render Function ---
+    function renderItems(container, items, itemRenderer) {
+        if (!container) return;
+        container.innerHTML = ''; // Clear previous content
+        items.forEach(item => {
+            const element = itemRenderer(item);
+            if (element) {
+                container.appendChild(element);
+            }
+        });
+    }
+
+    // --- Specific Item Renderers ---
+    
+    function createScheduleItemElement(item) {
+        // This is specific to schedule grid, so it's handled differently
+        // We return null here because rendering is done within displaySchedule
+        return null; 
+    }
+
+    function createDueDateElement(item) {
+        const li = document.createElement('li');
+        li.classList.add('due-date-item');
+        li.innerHTML = `
+            <strong>${item.title}</strong> (${item.class})<br>
+            Due: ${formatDateTime(item.dueDate)}
+            ${item.notes ? `<br><small>${item.notes}</small>` : ''}
+            <button class="delete-btn" data-id="${item.id}" data-type="due-date">×</button>
+        `;
+        return li;
+    }
+
+    function createActivityElement(item) {
+        const li = document.createElement('li');
+        li.classList.add('activity-item');
+        li.innerHTML = `
+            <strong>${item.name}</strong><br>
+            ${formatDateTime(item.date)}
+            ${item.notes ? `<br><small>${item.notes}</small>` : ''}
+            <button class="delete-btn" data-id="${item.id}" data-type="activity">×</button>
+        `;
+        return li;
+    }
+
+    // --- Functions to Display Data (Using Generic Renderer) ---
 
     function displaySchedule() {
         if (!scheduleGrid) return;
         scheduleGrid.innerHTML = ''; // Clear previous content
 
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const dayElements = {}; // Store references to day divs
 
         // Create day columns
         daysOfWeek.forEach(day => {
@@ -63,135 +122,89 @@ document.addEventListener('DOMContentLoaded', () => {
             dayDiv.classList.add('schedule-day');
             dayDiv.innerHTML = `<h3>${day}</h3>`;
             scheduleGrid.appendChild(dayDiv);
+            dayElements[day] = dayDiv; // Store reference
+        });
 
-            // For each schedule item
-            scheduleItems.forEach(item => {
-                // Check if this item occurs on this day
-                if (item.days && item.days.includes(day)) {
+        // Sort schedule items by start time for consistent ordering within days
+        scheduleItems.sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
+
+        // Add items to the appropriate day columns
+        scheduleItems.forEach(item => {
+            item.days?.forEach(day => {
+                if (dayElements[day]) {
                     const itemDiv = document.createElement('div');
                     itemDiv.classList.add('schedule-item');
                     
-                    // Format the display text
                     const startTimeFormatted = formatTime(item.startTime);
                     const endTimeFormatted = item.endTime ? formatTime(item.endTime) : '';
-                    const timeDisplay = endTimeFormatted 
-                        ? `${startTimeFormatted} - ${endTimeFormatted}` 
-                        : startTimeFormatted;
+                    const timeDisplay = endTimeFormatted ? `${startTimeFormatted} - ${endTimeFormatted}` : startTimeFormatted;
                     
                     itemDiv.innerHTML = `
                         ${timeDisplay}<br>
-                        ${item.subject}
+                        <strong>${item.subject}</strong>
                         <button class="delete-btn" data-id="${item.id}" data-type="schedule">×</button>
                     `;
-                    dayDiv.appendChild(itemDiv);
+                    dayElements[day].appendChild(itemDiv);
                 }
             });
-        });
-
-        // Add event listeners for delete buttons
-        document.querySelectorAll('.delete-btn[data-type="schedule"]').forEach(btn => {
-            btn.addEventListener('click', handleDelete);
         });
     }
 
     function displayDueDates() {
-        if (!dueDatesList) return;
-        dueDatesList.innerHTML = ''; // Clear previous content
-        
-        // Sort by due date
         dueDates.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-
-        dueDates.forEach(item => {
-            const li = document.createElement('li');
-            li.classList.add('due-date-item');
-            
-            // Format the date and time
-            const dueDate = new Date(item.dueDate);
-            const formattedDate = dueDate.toLocaleString([], { 
-                dateStyle: 'medium', 
-                timeStyle: 'short' 
-            });
-            
-            li.innerHTML = `
-                <strong>${item.title}</strong> (${item.class})<br>
-                Due: ${formattedDate}
-                ${item.notes ? `<br><small>${item.notes}</small>` : ''}
-                <button class="delete-btn" data-id="${item.id}" data-type="due-date">×</button>
-            `;
-            dueDatesList.appendChild(li);
-        });
-
-        // Add event listeners for delete buttons
-        document.querySelectorAll('.delete-btn[data-type="due-date"]').forEach(btn => {
-            btn.addEventListener('click', handleDelete);
-        });
+        renderItems(dueDatesList, dueDates, createDueDateElement);
     }
 
     function displayActivities() {
-        if (!activitiesList) return;
-        activitiesList.innerHTML = ''; // Clear previous content
-        
-        // Sort by date
         activities.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        activities.forEach(item => {
-            const li = document.createElement('li');
-            li.classList.add('activity-item');
-            
-            // Format date/time for better display
-            const dateTime = new Date(item.date);
-            const formattedDate = dateTime.toLocaleString([], { 
-                dateStyle: 'medium', 
-                timeStyle: 'short' 
-            });
-            
-            li.innerHTML = `
-                <strong>${item.name}</strong><br>
-                ${formattedDate}
-                ${item.notes ? `<br><small>${item.notes}</small>` : ''}
-                <button class="delete-btn" data-id="${item.id}" data-type="activity">×</button>
-            `;
-            activitiesList.appendChild(li);
-        });
-
-        // Add event listeners for delete buttons
-        document.querySelectorAll('.delete-btn[data-type="activity"]').forEach(btn => {
-            btn.addEventListener('click', handleDelete);
-        });
+        renderItems(activitiesList, activities, createActivityElement);
     }
 
-    // --- Delete Item Handler ---
-    function handleDelete(e) {
-        const id = e.target.getAttribute('data-id');
-        const type = e.target.getAttribute('data-type');
+    // --- Handle Clicks (Event Delegation) ---
+    function handleListClick(e) {
+        if (e.target.classList.contains('delete-btn')) {
+            handleDelete(e.target);
+        }
+    }
+
+    function handleDelete(deleteButton) {
+        const id = deleteButton.getAttribute('data-id');
+        const type = deleteButton.getAttribute('data-type');
+
+        // Optional: Add a confirmation dialog
+        // if (!confirm('Are you sure you want to delete this item?')) {
+        //     return;
+        // }
 
         if (type === 'schedule') {
             scheduleItems = scheduleItems.filter(item => item.id !== id);
             saveData(SCHEDULE_KEY, scheduleItems);
-            displaySchedule();
+            displaySchedule(); // Re-render the specific list
         } else if (type === 'due-date') {
             dueDates = dueDates.filter(item => item.id !== id);
             saveData(DUEDATES_KEY, dueDates);
-            displayDueDates();
+            displayDueDates(); // Re-render the specific list
         } else if (type === 'activity') {
             activities = activities.filter(item => item.id !== id);
             saveData(ACTIVITIES_KEY, activities);
-            displayActivities();
+            displayActivities(); // Re-render the specific list
         }
     }
+
+    // Add delegated event listeners to containers
+    scheduleGrid?.addEventListener('click', handleListClick);
+    dueDatesList?.addEventListener('click', handleListClick);
+    activitiesList?.addEventListener('click', handleListClick);
+
 
     // --- Event Listeners for Forms ---
 
     if (addScheduleForm) {
         addScheduleForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const formData = new FormData(addScheduleForm);
+            const selectedDays = formData.getAll('days');
             
-            // Get selected days
-            const selectedDays = Array.from(
-                addScheduleForm.querySelectorAll('input[name="days"]:checked')
-            ).map(input => input.value);
-            
-            // Validate that at least one day is selected
             if (selectedDays.length === 0) {
                 alert('Please select at least one day');
                 return;
@@ -200,9 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const newItem = {
                 id: generateId(),
                 days: selectedDays,
-                startTime: addScheduleForm.startTime.value,
-                endTime: addScheduleForm.endTime.value || null,
-                subject: addScheduleForm.subject.value
+                startTime: formData.get('startTime'),
+                endTime: formData.get('endTime') || null,
+                subject: formData.get('subject')
             };
             
             scheduleItems.push(newItem);
@@ -215,12 +228,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addDueDateForm) {
         addDueDateForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const formData = new FormData(addDueDateForm);
             const newItem = {
                 id: generateId(),
-                class: addDueDateForm.elements['class'].value,
-                title: addDueDateForm.elements['title'].value,
-                dueDate: addDueDateForm.elements['dueDate'].value,
-                notes: addDueDateForm.elements['notes'].value
+                class: formData.get('class'),
+                title: formData.get('title'),
+                dueDate: formData.get('dueDate'),
+                notes: formData.get('notes')
             };
             dueDates.push(newItem);
             saveData(DUEDATES_KEY, dueDates);
@@ -232,11 +246,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (addActivityForm) {
         addActivityForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const formData = new FormData(addActivityForm);
             const newItem = {
                 id: generateId(),
-                name: addActivityForm.elements['name'].value,
-                date: addActivityForm.elements['date'].value,
-                notes: addActivityForm.elements['notes'].value
+                name: formData.get('name'),
+                date: formData.get('date'),
+                notes: formData.get('notes')
             };
             activities.push(newItem);
             saveData(ACTIVITIES_KEY, activities);
@@ -245,83 +260,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Data Structure Conversion (if needed) ---
-    // This function handles conversion from the old data structure (single-day classes)
-    // to new data structure (classes with multiple days)
+    // --- Data Structure Conversion & ID Ensuring ---
+    // (Keep these functions as they handle legacy data and ensure IDs exist)
     function convertOldScheduleData() {
-        // Check if we need to convert (look for an item without id and days array)
         const needsConversion = scheduleItems.some(item => 
-            !item.id || !Array.isArray(item.days) || !item.startTime
+            !item.id || !Array.isArray(item.days) || (item.hasOwnProperty('time') && !item.hasOwnProperty('startTime'))
         );
         
         if (needsConversion) {
-            console.log('Converting old schedule data format to new format...');
-            
-            // Create a new array with the converted structure
-            const newScheduleItems = scheduleItems.map(item => {
-                // If it's already in the new format, return as is
-                if (item.id && Array.isArray(item.days) && item.startTime) {
-                    return item;
-                }
-                
-                // Convert from old format to new format
+            console.log('Converting old schedule data format...');
+            scheduleItems = scheduleItems.map(item => {
+                if (item.id && Array.isArray(item.days) && item.startTime) return item;
                 return {
-                    id: generateId(),
-                    days: [item.day], // Old format had a single day
-                    startTime: item.time, // Old format had 'time' instead of 'startTime'
-                    endTime: null,
+                    id: item.id || generateId(),
+                    days: Array.isArray(item.days) ? item.days : [item.day].filter(Boolean),
+                    startTime: item.startTime || item.time, 
+                    endTime: item.endTime || null,
                     subject: item.subject
                 };
-            });
-            
-            // Replace the old array with the new one
-            scheduleItems = newScheduleItems;
+            }).filter(item => item.days && item.days.length > 0 && item.subject); // Ensure converted items are valid
             saveData(SCHEDULE_KEY, scheduleItems);
             console.log('Conversion complete.');
         }
     }
 
-    // --- Convert old data structure if needed ---
-    convertOldScheduleData();
-
-    // --- Add IDs to items that don't have them (for existing data) ---
     function ensureItemsHaveIds() {
         let updated = false;
-        
-        // Schedule items
-        scheduleItems = scheduleItems.map(item => {
+        const updateId = (item) => {
             if (!item.id) {
                 updated = true;
                 return { ...item, id: generateId() };
             }
             return item;
-        });
+        };
         
-        // Due dates
-        dueDates = dueDates.map(item => {
-            if (!item.id) {
-                updated = true;
-                return { ...item, id: generateId() };
-            }
-            return item;
-        });
-        
-        // Activities
-        activities = activities.map(item => {
-            if (!item.id) {
-                updated = true;
-                return { ...item, id: generateId() };
-            }
-            return item;
-        });
+        scheduleItems = scheduleItems.map(updateId);
+        dueDates = dueDates.map(updateId);
+        activities = activities.map(updateId);
         
         if (updated) {
+            console.log('Adding missing IDs to items...');
             saveData(SCHEDULE_KEY, scheduleItems);
             saveData(DUEDATES_KEY, dueDates);
             saveData(ACTIVITIES_KEY, activities);
+            console.log('Finished adding missing IDs.');
         }
     }
     
+    convertOldScheduleData();
     ensureItemsHaveIds();
 
     // --- Initial Load ---
@@ -339,5 +325,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-
 }); 
