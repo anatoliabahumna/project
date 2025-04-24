@@ -1,0 +1,107 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+section {
+    background: #fff;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+h2 {
+    color: #555;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-top: 0;
+}
+
+/* Schedule Grid */
+#schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 days a week */
+    gap: 10px;
+    border: 1px solid #eee;
+    padding: 10px;
+    min-height: 150px; /* Ensure grid has some height */
+}
+
+.schedule-day {
+    border: 1px solid #ddd;
+    padding: 8px;
+    background-color: #f9f9f9;
+    min-height: 100px; /* Ensure days have some height */
+}
+
+.schedule-day h3 {
+    margin: 0 0 5px 0;
+    font-size: 0.9em;
+    color: #666;
+    text-align: center;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 3px;
+}
+
+/* Lists */
+#due-dates-list, #activities-list {
+    list-style: none;
+    padding: 0;
+}
+
+#due-dates-list li, #activities-list li {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+}
+
+/* Forms */
+form {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    display: flex; /* Basic layout */
+    flex-wrap: wrap; /* Allow items to wrap */
+    gap: 10px; /* Space between elements */
+}
+
+form input[type="text"],
+form input[type="time"],
+form input[type="date"],
+form input[type="datetime-local"],
+form select,
+form button {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95em;
+}
+
+form button {
+    background-color: #5cb85c;
+    color: white;
+    border-color: #4cae4c;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+form button:hover {
+    background-color: #449d44;
+}
+
+form label {
+    margin-right: 5px;
+    font-weight: bold;
+} 

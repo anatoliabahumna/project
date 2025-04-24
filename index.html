@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Organizer</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#5cb85c">
+</head>
+<body>
+    <h1>Class Organizer</h1>
+
+    <section id="schedule">
+        <h2>Weekly Schedule</h2>
+
+        <form id="add-schedule-item-form">
+            <select name="day" required>
+                <option value="" disabled selected>Select Day</option>
+                <option value="Sunday">Sunday</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+            </select>
+            <input type="time" name="time" required>
+            <input type="text" name="subject" placeholder="Class/Subject" required>
+            <button type="submit">Add Schedule Item</button>
+        </form>
+
+        <div id="schedule-grid">
+            <!-- Schedule items will be dynamically added here -->
+        </div>
+    </section>
+
+    <section id="due-dates">
+        <h2>Due Dates</h2>
+
+        <form id="add-due-date-form">
+            <input type="text" name="class" placeholder="Class Name" required>
+            <input type="text" name="title" placeholder="Assignment Title" required>
+            <input type="date" name="dueDate" required>
+            <input type="text" name="notes" placeholder="Notes (Optional)">
+            <button type="submit">Add Due Date</button>
+        </form>
+
+        <ul id="due-dates-list">
+            <!-- Due date items will be dynamically added here -->
+        </ul>
+    </section>
+
+    <section id="activities">
+        <h2>Activities</h2>
+
+        <form id="add-activity-form">
+            <input type="text" name="name" placeholder="Activity Name" required>
+            <input type="datetime-local" name="date" required>
+            <input type="text" name="notes" placeholder="Notes (Optional)">
+            <button type="submit">Add Activity</button>
+        </form>
+
+        <ul id="activities-list">
+            <!-- Activity items will be dynamically added here -->
+        </ul>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html> 
